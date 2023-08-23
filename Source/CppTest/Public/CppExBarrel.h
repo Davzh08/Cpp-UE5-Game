@@ -19,6 +19,9 @@ public:
 	// Sets default values for this actor's properties
 	ACppExBarrel();
 
+	//Function to explode the barrel by using Explode Lever
+	void Explode(); 
+
 protected:
 	
 	UPROPERTY(VisibleAnywhere)

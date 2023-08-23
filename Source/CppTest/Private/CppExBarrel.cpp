@@ -42,3 +42,9 @@ void ACppExBarrel::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherAc
 {
 	ForceComp->FireImpulse();
 }
+
+//Function of Explode the barrel by explode lever
+void ACppExBarrel::Explode()
+{
+	ForceComp->FireImpulse();
+}
