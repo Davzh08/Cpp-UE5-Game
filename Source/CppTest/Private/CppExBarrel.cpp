@@ -3,6 +3,7 @@
 
 #include "CppExBarrel.h"
 #include "PhysicsEngine/RadialForceComponent.h"
+#include "DrawDebugHelpers.h"
 #include "Components/StaticMeshComponent.h"
 
 // Sets default values
@@ -41,10 +42,22 @@ void ACppExBarrel::PostInitializeComponents()
 void ACppExBarrel::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	ForceComp->FireImpulse();
+
+	UE_LOG(LogTemp, Log, TEXT("OnActorHit in Explosive Barrel"));
+
+	// %s = string
+	// %f = float
+	// logs: "OtherActor: MyActor_1, at gametime: 124.4"
+	UE_LOG(LogTemp, Warning, TEXT("OtherActor: %s, at game time: %f"), *GetNameSafe(OtherActor), GetWorld()->TimeSeconds);
+
+	FString CombinedString = FString::Printf(TEXT("Hit at location: %s"), *Hit.ImpactPoint.ToString());
+	DrawDebugString(GetWorld(), Hit.ImpactPoint, CombinedString, nullptr, FColor::Green, 2.0f, true);
 }
 
 //Function of Explode the barrel by explode lever
 void ACppExBarrel::Explode()
 {
 	ForceComp->FireImpulse();
+
+
 }
