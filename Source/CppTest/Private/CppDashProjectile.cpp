@@ -44,5 +44,10 @@ void ACppDashProjectile::Explode_Implementation()
 void ACppDashProjectile::TeleportInstigator()
 {
     AActor* ActorToTeleport = GetInstigator();
+    if (ensure(ActorToTeleport))
+    {
+        //Keep Instigator rotation or it may end up jarring
+        ActorToTeleport->TeleportTo(GetActorLocation(), ActorToTeleport->GetActorRotation(), false, false);
+    }
 
 }

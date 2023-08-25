@@ -27,7 +27,7 @@ ACppCharacter::ACppCharacter()
 
 	bUseControllerRotationYaw = false;
 
-	AttackAnimDelay = 0.2f;
+	AttackAnimDelay = 0.18f;
 }
 
 // Called to bind functionality to input
@@ -44,8 +44,8 @@ void ACppCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("Up", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ACppCharacter::PrimaryAttack);
-	PlayerInputComponent->BindAction("BlackholeAttack", IE_Pressed, this, &ACppCharacter::Blackhole);
-	PlayerInputComponent->BindAction("FireDash", IE_Pressed, this, &ACppCharacter::Dash);
+	PlayerInputComponent->BindAction("Blackhole", IE_Pressed, this, &ACppCharacter::Blackhole);
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ACppCharacter::Dash);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ACppCharacter::PrimaryInteract);
 }
 
@@ -102,7 +102,7 @@ void ACppCharacter::Blackhole()
 {
 	PlayAnimMontage(BlackholeAnim);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_Blackhole, this, &ACppCharacter::Dash_TimeElapsed, AttackAnimDelay);
+	GetWorldTimerManager().SetTimer(TimerHandle_Blackhole, this, &ACppCharacter::Blackhole_TimeElapsed, AttackAnimDelay);
 }
 
 void ACppCharacter::Blackhole_TimeElapsed()
@@ -114,7 +114,7 @@ void ACppCharacter::SpawnProjectile(TSubclassOf<AActor> classToSpawn)
 {
 	if (ensureAlways(classToSpawn))
 	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("evil_weapon_r");
+		FVector HandLocation = GetMesh()->GetSocketLocation("evil_weapon_blades");
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -131,6 +131,7 @@ void ACppCharacter::SpawnProjectile(TSubclassOf<AActor> classToSpawn)
 		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
 		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
+		ObjParams.AddObjectTypesToQuery(ECC_PhysicsBody);
 
 		FVector TraceStart = CameraComp->GetComponentLocation();
 

@@ -3,43 +3,42 @@
 
 #include "CppBlackhole.h"
 #include "Components/SphereComponent.h"
+#include "PhysicsEngine/RadialForceComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 
 // Sets default values
 ACppBlackhole::ACppBlackhole()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	ForceComp = CreateDefaultSubobject<URadialForceComponent>("ForceComp");
+	ForceComp->SetupAttachment(SphereComp);
 
-	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
-	/*SphereComp->SetCollisionObjectType(ECC_WorldDynamic);
-	SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);*/
-	SphereComp->SetCollisionProfileName("Projectile");
-	RootComponent = SphereComp;
+	// Activate the force component so it constantly applies forces
+	ForceComp->SetAutoActivate(true);
 
-	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
-	EffectComp->SetupAttachment(SphereComp);
+	ForceComp->Radius = 750.0f;
 
-	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
-	MovementComp->InitialSpeed = 1000.0f;
-	MovementComp->bRotationFollowsVelocity = true;
-	MovementComp->bInitialVelocityInLocalSpace = true;
+	// Use ForceStrength instead of ImpulseStrength for a continuous force
+	ForceComp->ForceStrength = -200000.0f;  // A negative value creates a pulling force
 
+	// Disable impulse since we're using a continuous force
+	ForceComp->bImpulseVelChange = false;
+	ForceComp->bIgnoreOwningActor = true;  // So it doesn't affect the blackhole itself
 }
 
-// Called when the game starts or when spawned
 void ACppBlackhole::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	// Set timer to destroy blackhole, the time that blackhole last
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &ACppBlackhole::DestroyBlackhole, 5.5f, false);
+
 }
 
-// Called every frame
-void ACppBlackhole::Tick(float DeltaTime)
+void ACppBlackhole::DestroyBlackhole()
 {
-	Super::Tick(DeltaTime);
-
+	Destroy();
 }
+
+
 

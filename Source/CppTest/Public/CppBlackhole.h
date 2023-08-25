@@ -4,36 +4,33 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "CppProjectileBase.h"
 #include "CppBlackhole.generated.h"
 
-class USphereComponent;
+class URadialForceComponent;
 class UProjectileMovementComponent;
-class UParticleSystemComponent;
 
 UCLASS()
-class CPPTEST_API ACppBlackhole : public AActor
+class CPPTEST_API ACppBlackhole : public ACppProjectileBase
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ACppBlackhole();
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	USphereComponent* SphereComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UProjectileMovementComponent* MovementComp;
+	URadialForceComponent* ForceComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UParticleSystemComponent* EffectComp;
+	UPROPERTY()
+	FTimerHandle DestroyTimer;
 
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void DestroyBlackhole();
+
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 };
