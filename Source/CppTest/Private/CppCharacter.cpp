@@ -26,20 +26,8 @@ ACppCharacter::ACppCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
-}
 
-// Called when the game starts or when spawned
-void ACppCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void ACppCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	AttackAnimDelay = 0.2f;
 }
 
 // Called to bind functionality to input
@@ -56,6 +44,8 @@ void ACppCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("Up", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ACppCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("BlackholeAttack", IE_Pressed, this, &ACppCharacter::Blackhole);
+	PlayerInputComponent->BindAction("FireDash", IE_Pressed, this, &ACppCharacter::Dash);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ACppCharacter::PrimaryInteract);
 }
 
@@ -83,51 +73,84 @@ void ACppCharacter::MoveRight(float value)
 	AddMovementInput(RightVector, value);
 }
 
+
 void ACppCharacter::PrimaryAttack()
 {
 	PlayAnimMontage(AttackAnim);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ACppCharacter::PrimaryAttack_TimeElapsed, 0.2f);
-
-	//GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack);
-	
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ACppCharacter::PrimaryAttack_TimeElapsed, AttackAnimDelay);
 }
-
-//void ACppCharacter::PrimaryAttack_TimeElapsed()
-//{
-//	FVector HandLocation = GetMesh()->GetSocketLocation("evil_weapon_base");
-//
-//	FTransform SpawnTM = FTransform(GetActorRotation(), HandLocation);
-//
-//	FActorSpawnParameters SpawnParams;
-//	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-//
-//	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
-//}
 
 void ACppCharacter::PrimaryAttack_TimeElapsed()
 {
-	// Get Controller's camera vector information
-	FVector CameraLocation;
-	FRotator CameraRotation;
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	SpawnProjectile(ProjectileClass);
+}
+
+void ACppCharacter::Dash()
+{
+	PlayAnimMontage(DashAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_Dash, this, &ACppCharacter::Dash_TimeElapsed, AttackAnimDelay);
+}
+
+void ACppCharacter::Dash_TimeElapsed()
+{
+	SpawnProjectile(DashProjectileClass);
+}
+
+void ACppCharacter::Blackhole()
+{
+	PlayAnimMontage(BlackholeAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_Blackhole, this, &ACppCharacter::Dash_TimeElapsed, AttackAnimDelay);
+}
+
+void ACppCharacter::Blackhole_TimeElapsed()
+{
+	SpawnProjectile(BlackholeProjectileClass);
+}
+
+void ACppCharacter::SpawnProjectile(TSubclassOf<AActor> classToSpawn)
+{
+	if (ensureAlways(classToSpawn))
 	{
-		PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+		FVector HandLocation = GetMesh()->GetSocketLocation("evil_weapon_r");
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+
+		FCollisionShape Shape;
+		Shape.SetSphere(20.0f);
+
+		//ignore player
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		FCollisionObjectQueryParams ObjParams;
+		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
+		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
+
+		FVector TraceStart = CameraComp->GetComponentLocation();
+
+		//endpoint far into the look-at distance (not too far, still adjust somewhat towards crosshair on a miss)
+		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
+
+		FHitResult Hit;
+		//return true if we got to a blocking hit
+		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params))
+		{
+			//Overwrite trace end with impact point in world
+			TraceEnd = Hit.ImpactPoint;
+		}
+
+		//find new direction/rotation from Hand pointing to impact point in world
+		FRotator ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
+
+		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
+		GetWorld()->SpawnActor<AActor>(classToSpawn, SpawnTM, SpawnParams);
 	}
-
-	// Calculate projectile direction
-	FVector ShootDirection = CameraRotation.Vector();
-
-	FVector HandLocation = GetMesh()->GetSocketLocation("evil_weapon_base");
-
-	FTransform SpawnTM = FTransform(ShootDirection.Rotation(), HandLocation);
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	// Spawn projectile actor
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }
 
 void ACppCharacter::PrimaryInteract()
