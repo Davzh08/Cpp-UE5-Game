@@ -25,6 +25,7 @@ void ACppDashProjectile::BeginPlay()
 
 void ACppDashProjectile::Explode_Implementation()
 {
+   
     //Clear timer if the Explode was already called through another source like OnActorHit
     GetWorldTimerManager().ClearTimer(TimerHandle_DelayedDetonate);
 

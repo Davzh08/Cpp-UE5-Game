@@ -7,6 +7,7 @@
 #include "DrawDebugHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CppInteractionComponent.h"
+#include "SAttributeComponent.h"
 
 // Sets default values
 ACppCharacter::ACppCharacter()
@@ -22,6 +23,8 @@ ACppCharacter::ACppCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	InteractionComp = CreateDefaultSubobject<UCppInteractionComponent>("InteractionComp");
+
+	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
@@ -153,6 +156,7 @@ void ACppCharacter::SpawnProjectile(TSubclassOf<AActor> classToSpawn)
 		GetWorld()->SpawnActor<AActor>(classToSpawn, SpawnTM, SpawnParams);
 	}
 }
+
 
 void ACppCharacter::PrimaryInteract()
 {

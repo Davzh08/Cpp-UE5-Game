@@ -20,7 +20,11 @@ public:
 	ACppExBarrel();
 
 	//Function to explode the barrel by using Explode Lever
+	UFUNCTION()
 	void Explode(); 
+
+	UFUNCTION()
+	void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 protected:
 	
@@ -33,7 +37,6 @@ protected:
 	virtual void PostInitializeComponents() override;
 
 	//Must be marked with ufunction in order to 'bind' the event
-	UFUNCTION()
-	void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	
 
 };

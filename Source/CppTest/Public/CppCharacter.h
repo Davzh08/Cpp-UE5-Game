@@ -6,10 +6,12 @@
 #include "GameFramework/Character.h"
 #include "CppCharacter.generated.h"
 
+
 class UCameraComponent;
 class USpringArmComponent;
 class UCppInteractionComponent;
 class UAnimMontage;
+class USAttributeComponent;
 
 UCLASS()
 class CPPTEST_API ACppCharacter : public ACharacter
@@ -57,6 +59,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UCppInteractionComponent* InteractionComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USAttributeComponent* AttributeComp;
 
 	void MoveForward(float value);
 	
