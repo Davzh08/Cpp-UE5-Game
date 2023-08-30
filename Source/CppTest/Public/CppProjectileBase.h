@@ -28,6 +28,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UParticleSystemComponent* EffectComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FlightSound")
+	UAudioComponent* FlightSoundComponent;
+
+	UPROPERTY(EditAnywhere, Category = "ExplodeSound")
+	USoundBase* ExplodeSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraShake")
+	TSubclassOf<UCameraShakeBase> CameraShake;
+
 	// Virtual so we can override this in chile-class
 	UFUNCTION()
 	virtual void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

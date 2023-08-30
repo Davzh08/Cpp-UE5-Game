@@ -6,6 +6,7 @@
 #include "PhysicsEngine/RadialForceComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ACppBlackhole::ACppBlackhole()
@@ -31,7 +32,10 @@ void ACppBlackhole::BeginPlay()
 	Super::BeginPlay();
 
 	// Set timer to destroy blackhole, the time that blackhole last
-	GetWorldTimerManager().SetTimer(DestroyTimer, this, &ACppBlackhole::DestroyBlackhole, 5.5f, false);
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &ACppBlackhole::DestroyBlackhole, 5.2f, false);
+
+	// Set timer to apply camera shake periodically
+	GetWorldTimerManager().SetTimer(CameraShakeTimer, this, &ACppBlackhole::ApplyCameraShake, 0.2f, true);
 
 }
 
@@ -40,5 +44,15 @@ void ACppBlackhole::DestroyBlackhole()
 	Destroy();
 }
 
-
+void ACppBlackhole::ApplyCameraShake()
+{
+	UGameplayStatics::PlayWorldCameraShake(
+		this,                        // World context object
+		CameraShake,                 // UCameraShakeBase subclass
+		GetActorLocation(),          // Epicenter of the shake
+		0.f,                         // Inner radius
+		2000.f,                      // Outer radius
+		1.f                          // Falloff
+	);
+}
 

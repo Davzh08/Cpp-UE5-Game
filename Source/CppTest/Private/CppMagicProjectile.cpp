@@ -6,6 +6,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "SAttributeComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 ACppMagicProjectile::ACppMagicProjectile()
@@ -25,23 +27,52 @@ ACppMagicProjectile::ACppMagicProjectile()
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
 	EffectComp->SetupAttachment(SphereComp);
 
+	FlightSoundComponent = CreateDefaultSubobject<UAudioComponent>("FlightSound");
+	FlightSoundComponent->SetupAttachment(SphereComp);
+
 	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
 	MovementComp->InitialSpeed = 1000.0f;
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
 }
 
+void ACppMagicProjectile::SpawnExplosion()
+{
+	if (ExplosionEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation(), GetActorRotation(), true);
+
+		if (ExplodeSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
+		}
+
+		UGameplayStatics::PlayWorldCameraShake(
+			this,                        // World context object
+			CameraShake,                 // UCameraShakeBase subclass
+			GetActorLocation(),          // Epicenter of the shake
+			0.f,                         // Inner radius
+			1000.f,                      // Outer radius
+			1.f                          // Falloff
+		);
+	}
+}
+
 void ACppMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(OtherActor && OtherActor != GetInstigator())
 	{
+		SpawnExplosion();
+
 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(-20.0f);
-
-			Destroy();
+			float MagicProjectileDamage = 20.0f;
+			AttributeComp->SetDamageAmount(MagicProjectileDamage);
+			AttributeComp->ApplyHealthChange(-MagicProjectileDamage);
 		}
+
+		Destroy();
 	}
 
 }
@@ -50,12 +81,17 @@ void ACppMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* 
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
+		SpawnExplosion();
+
 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(-20.0f);
-			Destroy();
+			float MagicProjectileDamage = 20.0f;
+			AttributeComp->SetDamageAmount(MagicProjectileDamage);
+			AttributeComp->ApplyHealthChange(-MagicProjectileDamage);
 		}
+
+		Destroy();
 	}
 }
 

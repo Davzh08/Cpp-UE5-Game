@@ -39,6 +39,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Blackhole")
 	UAnimMontage* BlackholeAnim;
 
+	UPROPERTY(EditDefaultsOnly, Category = "PrimaryAttackEffect")
+	UParticleSystem* PrimaryAttackEffect;
+
 	FTimerHandle TimerHandle_PrimaryAttack;
 
 	FTimerHandle TimerHandle_Dash;
@@ -82,6 +85,11 @@ protected:
 	void SpawnProjectile(TSubclassOf<AActor> classToSpawn);
 
 	void PrimaryInteract();
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
+
+	virtual void PostInitializeComponents();
 
 public:	
 	// Called to bind functionality to input

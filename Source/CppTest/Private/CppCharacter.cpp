@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CppInteractionComponent.h"
 #include "SAttributeComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ACppCharacter::ACppCharacter()
@@ -31,6 +32,13 @@ ACppCharacter::ACppCharacter()
 	bUseControllerRotationYaw = false;
 
 	AttackAnimDelay = 0.18f;
+}
+
+void ACppCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ACppCharacter::OnHealthChanged);
 }
 
 // Called to bind functionality to input
@@ -79,6 +87,8 @@ void ACppCharacter::MoveRight(float value)
 
 void ACppCharacter::PrimaryAttack()
 {
+	UGameplayStatics::SpawnEmitterAttached(PrimaryAttackEffect, GetMesh(), TEXT("WeaponSocketName"));
+	
 	PlayAnimMontage(AttackAnim);
 
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ACppCharacter::PrimaryAttack_TimeElapsed, AttackAnimDelay);
@@ -165,3 +175,18 @@ void ACppCharacter::PrimaryInteract()
 		InteractionComp->PrimaryInteract();
 	}
 }
+
+void ACppCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
+{
+	if (NewHealth <= 0.0f && Delta < 0.0f)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+	}
+
+	if (Delta < 0.0f)
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
+	}
+}
+

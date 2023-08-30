@@ -15,6 +15,13 @@ class CPPTEST_API USAttributeComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
+public:
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetHealth() const { return Health; }
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetHealthMax() const { return HealthMax; }
+	
 	// Sets default values for this component's properties
 	USAttributeComponent();
 
@@ -32,14 +39,26 @@ protected:
 	//Category = "" - display only for detail panels and blueprint context menu
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	float HealthMax;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float Health;
 
 public:	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	float DamageAmount;
+
+	UFUNCTION(BlueprintCallable)
+	bool IsAlive() const;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
 	
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(float Delta);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	void SetDamageAmount(float NewDamageAmount);
 	
 };

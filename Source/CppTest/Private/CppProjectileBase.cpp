@@ -6,6 +6,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 
 ACppProjectileBase::ACppProjectileBase()
@@ -17,6 +18,9 @@ ACppProjectileBase::ACppProjectileBase()
 
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
 	EffectComp->SetupAttachment(RootComponent);
+
+	FlightSoundComponent = CreateDefaultSubobject<UAudioComponent>("FlightSound");
+	FlightSoundComponent->SetupAttachment(RootComponent);
 
 	MoveComp = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMoveComp");
 	MoveComp->bRotationFollowsVelocity = true;
@@ -38,6 +42,11 @@ void ACppProjectileBase::Explode_Implementation()
 	if (ensure(!IsPendingKill()))
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+
+		if (ExplodeSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
+		}
 
 		Destroy();
 	}

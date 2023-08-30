@@ -27,10 +27,14 @@ protected:
 	UPROPERTY()
 	FTimerHandle DestroyTimer;
 
+	UPROPERTY()
+	FTimerHandle CameraShakeTimer;
+
 	virtual void BeginPlay() override;
 
 	void DestroyBlackhole();
 
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	void ApplyCameraShake();
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "CppProjectileBase.h"
 #include "CppMagicProjectile.generated.h"
 
 class USphereComponent;
@@ -27,6 +28,9 @@ protected:
 	UFUNCTION()
 	void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	UFUNCTION()
+	void SpawnExplosion();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USphereComponent* SphereComp;
 
@@ -35,6 +39,18 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* EffectComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "ExplosionEffect")
+	UParticleSystem* ExplosionEffect;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FlightSound")
+	UAudioComponent* FlightSoundComponent;
+
+	UPROPERTY(EditAnywhere, Category = "ExplodeSound")
+	USoundBase* ExplodeSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraShake")
+	TSubclassOf<UCameraShakeBase> CameraShake;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
