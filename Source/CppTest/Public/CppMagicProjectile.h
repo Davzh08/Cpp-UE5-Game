@@ -52,6 +52,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraShake")
 	TSubclassOf<UCameraShakeBase> CameraShake;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Damage Amount")
+	float DamageAmount;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

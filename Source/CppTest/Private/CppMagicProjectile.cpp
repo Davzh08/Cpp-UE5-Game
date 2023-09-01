@@ -34,6 +34,8 @@ ACppMagicProjectile::ACppMagicProjectile()
 	MovementComp->InitialSpeed = 1000.0f;
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
+	
+	DamageAmount = 20.0f;
 }
 
 void ACppMagicProjectile::SpawnExplosion()
@@ -67,7 +69,7 @@ void ACppMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
-			float MagicProjectileDamage = 20.0f;
+			float MagicProjectileDamage = DamageAmount;
 			AttributeComp->SetDamageAmount(MagicProjectileDamage);
 			AttributeComp->ApplyHealthChange(-MagicProjectileDamage);
 		}
@@ -86,7 +88,7 @@ void ACppMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* 
 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
-			float MagicProjectileDamage = 20.0f;
+			float MagicProjectileDamage = DamageAmount;
 			AttributeComp->SetDamageAmount(MagicProjectileDamage);
 			AttributeComp->ApplyHealthChange(-MagicProjectileDamage);
 		}
