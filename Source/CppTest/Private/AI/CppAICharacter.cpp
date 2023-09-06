@@ -2,33 +2,67 @@
 
 
 #include "AI/CppAICharacter.h"
+#include "Perception/PawnSensingComponent.h"
+#include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "DrawDebugHelpers.h"
+#include "SAttributeComponent.h"
 
 // Sets default values
 ACppAICharacter::ACppAICharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
+	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
+
+    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 }
 
-// Called when the game starts or when spawned
-void ACppAICharacter::BeginPlay()
+
+void ACppAICharacter::PostInitializeComponents()
 {
-	Super::BeginPlay();
+	Super::PostInitializeComponents();
 	
+	PawnSensingComp->OnSeePawn.AddDynamic(this, &ACppAICharacter::OnPawnSeen);
+
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ACppAICharacter::OnHealthChanged);
 }
 
-// Called every frame
-void ACppAICharacter::Tick(float DeltaTime)
+void ACppAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	Super::Tick(DeltaTime);
+	AAIController* AIC = Cast<AAIController>(GetController());
+	if (AIC)
+	{
+		UBlackboardComponent* BBComp = AIC->GetBlackboardComponent();
 
+		BBComp->SetValueAsObject("TargetActor", Pawn);
+
+		DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.0f, true);
+	}
 }
 
-// Called to bind functionality to input
-void ACppAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ACppAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+    if (NewHealth <= 0.0f && Delta < 0.0f)
+    {
+        AAIController* AIC = Cast<AAIController>(GetController());
+        if (AIC)
+        {
+            // Make the AI stop controlling the character
+            AIC->UnPossess();
+        }
 
+        // Set a timer to destroy this actor after a delay
+        // For example, 5 seconds
+        SetLifeSpan(1.0f);
+
+        // If you don't want to use SetLifeSpan, you can also use a timer:
+        // GetWorld()->GetTimerManager().SetTimer(TimerHandle_DestroySelf, this, &ACppAICharacter::DestroySelf, 5.0f, false);
+    }
+
+    if (Delta < 0.0f)
+    {
+        GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
+    }
 }
-

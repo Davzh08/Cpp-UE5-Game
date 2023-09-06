@@ -6,24 +6,32 @@
 #include "GameFramework/Character.h"
 #include "CppAICharacter.generated.h"
 
+class UPawnSensingComponent;
+class USAttributeComponent;
+
 UCLASS()
 class CPPTEST_API ACppAICharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
+	
 	// Sets default values for this character's properties
 	ACppAICharacter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USAttributeComponent* AttributeComp;
+	
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void PostInitializeComponents() override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPawnSensingComponent* PawnSensingComp;
+
+	UFUNCTION()
+	void OnPawnSeen(APawn* Pawn);
 
 };
