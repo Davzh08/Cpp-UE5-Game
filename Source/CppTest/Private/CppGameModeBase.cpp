@@ -8,13 +8,14 @@
 #include "AI/CppAICharacter.h"
 #include "SAttributeComponent.h"
 #include "EngineUtils.h"
+#include "DrawDebugHelpers.h"
 
 
 
 
 ACppGameModeBase::ACppGameModeBase()
 {
-	SpawnTimerInterval = 2.0f;
+	SpawnTimerInterval = 5.0f;
 }
 
 
@@ -71,6 +72,7 @@ void ACppGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Query
 	
 	if (NrOfAliveBots >= MaxBotCount)
 	{
+		UE_LOG(LogTemp, Log, TEXT("At maximum bot capacity, skipping bot spawn."))
 		return;
 	}
 
@@ -79,6 +81,8 @@ void ACppGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Query
 	if (Locations.IsValidIndex(0))
 	{
 		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
+
+		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Blue, false, 60.0f);
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Spawn Location: %s"), *Locations[0].ToString());
