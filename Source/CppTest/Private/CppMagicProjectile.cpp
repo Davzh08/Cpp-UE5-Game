@@ -71,7 +71,7 @@ void ACppMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 		{
 			float MagicProjectileDamage = DamageAmount;
 			AttributeComp->SetDamageAmount(MagicProjectileDamage);
-			AttributeComp->ApplyHealthChange(-MagicProjectileDamage);
+			AttributeComp->ApplyHealthChange(GetInstigator(), -MagicProjectileDamage);
 		}
 
 		Destroy();
@@ -90,7 +90,7 @@ void ACppMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* 
 		{
 			float MagicProjectileDamage = DamageAmount;
 			AttributeComp->SetDamageAmount(MagicProjectileDamage);
-			AttributeComp->ApplyHealthChange(-MagicProjectileDamage);
+			AttributeComp->ApplyHealthChange(GetInstigator(), -MagicProjectileDamage);
 		}
 
 		Destroy();

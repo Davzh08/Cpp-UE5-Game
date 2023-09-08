@@ -14,8 +14,14 @@ class CPPTEST_API USAttributeComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
 public:
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	static USAttributeComponent* GetAttributes(AActor* FromActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes", meta = (DisplayName = "IsAlive"))
+	static bool IsActorAlive(AActor* Actor);
+	
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	float GetHealth() const { return Health; }
 
@@ -56,7 +62,7 @@ public:
 	FOnHealthChanged OnHealthChanged;
 	
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	bool ApplyHealthChange(float Delta);
+	bool ApplyHealthChange(AActor* InstigatorActor, float NewDamageAmount);
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	void SetDamageAmount(float NewDamageAmount);

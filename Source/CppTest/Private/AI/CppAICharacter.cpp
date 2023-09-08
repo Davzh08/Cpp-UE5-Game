@@ -32,21 +32,29 @@ void ACppAICharacter::PostInitializeComponents()
 
 void ACppAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	AAIController* AIC = Cast<AAIController>(GetController());
-	if (AIC)
-	{
-		UBlackboardComponent* BBComp = AIC->GetBlackboardComponent();
+    SetTargetActor(Pawn);
 
-		BBComp->SetValueAsObject("TargetActor", Pawn);
+	DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.0f, true);
+}
 
-		DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.0f, true);
-	}
+void ACppAICharacter::SetTargetActor(AActor* NewTarget)
+{
+    AAIController* AIC = Cast<AAIController>(GetController());
+    if (AIC)
+    {
+        AIC->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);
+    }
 }
 
 void ACppAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
     if (Delta < 0.0f)
     {
+        if (InstigatorActor != this)
+        {
+            SetTargetActor(InstigatorActor);
+        }
+
         if (NewHealth <= 0.0f)
         {
             //Stop BT

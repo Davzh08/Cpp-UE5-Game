@@ -52,9 +52,9 @@ void ACppHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
             {
                 SpawnHealFX();
 
-                AttributeComp->ApplyHealthChange(HealValue);
+                AttributeComp->ApplyHealthChange(this, HealValue);
 
-                // 在原地生成一个特效（需要你自己设置特效）
+                // Spawn an effect
                 // UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), YourParticleEffect, GetActorLocation());
 
                 // CD and disappear
