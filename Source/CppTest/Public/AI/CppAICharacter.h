@@ -8,6 +8,8 @@
 
 class UPawnSensingComponent;
 class USAttributeComponent;
+class UUserWidget;
+class UCppWorldUserWidget;
 
 UCLASS()
 class CPPTEST_API ACppAICharacter : public ACharacter
@@ -19,7 +21,18 @@ public:
 	// Sets default values for this character's properties
 	ACppAICharacter();
 
+	USAttributeComponent* GetAttributeComponent() const { return AttributeComp; }
+
+	UFUNCTION()
+	void HealToFull();
+
 protected:
+
+	UCppWorldUserWidget* ActiveHealthBar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComp;
 	

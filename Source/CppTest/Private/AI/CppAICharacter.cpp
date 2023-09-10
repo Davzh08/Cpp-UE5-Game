@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "SAttributeComponent.h"
 #include "BrainComponent.h"
+#include "CppWorldUserWidget.h"
 
 // Sets default values
 ACppAICharacter::ACppAICharacter()
@@ -55,6 +56,18 @@ void ACppAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeCompon
             SetTargetActor(InstigatorActor);
         }
 
+
+        if (ActiveHealthBar == nullptr)
+        {
+            ActiveHealthBar = CreateWidget<UCppWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+            if (ActiveHealthBar)
+            {
+                ActiveHealthBar->AttachedActor = this;
+                ActiveHealthBar->AddToViewport();
+            }
+        }
+
+
         if (NewHealth <= 0.0f)
         {
             //Stop BT
@@ -78,4 +91,9 @@ void ACppAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeCompon
     {
         GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
     }
+}
+
+void ACppAICharacter::HealToFull()
+{
+    AttributeComp->ApplyHealthChange(this, AttributeComp->GetHealthMax());
 }

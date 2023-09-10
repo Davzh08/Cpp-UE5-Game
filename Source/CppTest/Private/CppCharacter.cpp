@@ -190,3 +190,7 @@ void ACppCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 	}
 }
 
+void ACppCharacter::HealSelf(float Amount /* = 100 */)
+{
+	AttributeComp->ApplyHealthChange(this, Amount);
+}

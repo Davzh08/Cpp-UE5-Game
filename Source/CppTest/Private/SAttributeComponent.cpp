@@ -18,6 +18,7 @@ void USAttributeComponent::SetDamageAmount(float NewDamageAmount)
 
 bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float NewDamageAmount)
 {
+    
     // record health before health change
     float OldHealth = Health;
 
@@ -57,4 +58,9 @@ bool USAttributeComponent::IsActorAlive(AActor* Actor)
     }
 
     return false;
+}
+
+bool USAttributeComponent::Kill(AActor* InstigatorActor)
+{
+    return ApplyHealthChange(InstigatorActor, -GetHealthMax());
 }

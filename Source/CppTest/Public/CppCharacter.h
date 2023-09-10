@@ -48,9 +48,6 @@ protected:
 
 	FTimerHandle TimerHandle_Blackhole;
 
-public:
-	// Sets default values for this character's properties
-	ACppCharacter();
 
 protected:
 	
@@ -92,7 +89,14 @@ protected:
 	virtual void PostInitializeComponents();
 
 public:	
+
+	// Sets default values for this character's properties
+	ACppCharacter();
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION(Exec)
+	void HealSelf(float Amount = 100);
 
 };

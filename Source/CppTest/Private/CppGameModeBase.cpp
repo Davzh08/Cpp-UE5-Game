@@ -88,6 +88,18 @@ void ACppGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Query
 	UE_LOG(LogTemp, Warning, TEXT("Spawn Location: %s"), *Locations[0].ToString());
 }
 
+void ACppGameModeBase::KillAll()
+{
+	for (TActorIterator<ACppAICharacter> It(GetWorld()); It; ++It)
+	{
+		ACppAICharacter* Bot = *It;
 
+		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(Bot);
+		if (ensure(AttributeComp) && AttributeComp->IsAlive())
+		{
+			AttributeComp->Kill(this);//Fixme : Pass in player? for kill credit
+		}
+	}
+}
 
 
