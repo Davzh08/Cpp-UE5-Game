@@ -8,6 +8,7 @@
 #include "SAttributeComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
+#include "CppGameplayFunctionLibrary.h"
 
 // Sets default values
 ACppMagicProjectile::ACppMagicProjectile()
@@ -66,13 +67,7 @@ void ACppMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 	{
 		SpawnExplosion();
 
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
-		if (AttributeComp)
-		{
-			float MagicProjectileDamage = DamageAmount;
-			AttributeComp->SetDamageAmount(MagicProjectileDamage);
-			AttributeComp->ApplyHealthChange(GetInstigator(), -MagicProjectileDamage);
-		}
+		UCppGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult);
 
 		Destroy();
 	}
@@ -84,15 +79,9 @@ void ACppMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* 
 	if (OtherActor && OtherActor != GetInstigator())
 	{
 		SpawnExplosion();
-
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
-		if (AttributeComp)
-		{
-			float MagicProjectileDamage = DamageAmount;
-			AttributeComp->SetDamageAmount(MagicProjectileDamage);
-			AttributeComp->ApplyHealthChange(GetInstigator(), -MagicProjectileDamage);
-		}
-
+		
+		UCppGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, Hit);
+		
 		Destroy();
 	}
 }

@@ -88,6 +88,8 @@ protected:
 
 	virtual void PostInitializeComponents();
 
+	virtual FVector GetPawnViewLocation() const override;
+
 public:	
 
 	// Sets default values for this character's properties

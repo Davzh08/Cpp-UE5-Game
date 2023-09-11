@@ -9,6 +9,8 @@
 #include "SAttributeComponent.h"
 #include "BrainComponent.h"
 #include "CppWorldUserWidget.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ACppAICharacter::ACppAICharacter()
@@ -19,6 +21,9 @@ ACppAICharacter::ACppAICharacter()
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
+
+    GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+    GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 
@@ -81,6 +86,9 @@ void ACppAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeCompon
             //Ragdoll
             GetMesh()->SetAllBodiesSimulatePhysics(true);
             GetMesh()->SetCollisionProfileName("Ragdoll");
+
+            GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            GetCharacterMovement()->DisableMovement();
 
             // Set a timer to destroy this actor after a del. Life Span
             SetLifeSpan(10.0f);
