@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CppInteractionComponent.h"
 #include "SAttributeComponent.h"
+#include "SActionComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -27,11 +28,11 @@ ACppCharacter::ACppCharacter()
 
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
+	ActionComp = CreateDefaultSubobject<USActionComponent>("ActionComp");
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
-
-	AttackAnimDelay = 0.18f;
 }
 
 void ACppCharacter::PostInitializeComponents()
@@ -55,6 +56,9 @@ void ACppCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACppCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACppCharacter::MoveRight);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ACppCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ACppCharacter::SprintStop);
 
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Up", this, &APawn::AddControllerPitchInput);
@@ -89,89 +93,31 @@ void ACppCharacter::MoveRight(float value)
 	AddMovementInput(RightVector, value);
 }
 
+void ACppCharacter::SprintStart()
+{
+	ActionComp->StartActionByName(this, "Sprint");
+}
+
+void ACppCharacter::SprintStop()
+{
+	ActionComp->StopActionByName(this, "Sprint");
+}
+
 
 void ACppCharacter::PrimaryAttack()
 {
-	UGameplayStatics::SpawnEmitterAttached(PrimaryAttackEffect, GetMesh(), TEXT("WeaponSocketName"));
-	
-	PlayAnimMontage(AttackAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ACppCharacter::PrimaryAttack_TimeElapsed, AttackAnimDelay);
-}
-
-void ACppCharacter::PrimaryAttack_TimeElapsed()
-{
-	SpawnProjectile(ProjectileClass);
+	ActionComp->StartActionByName(this, "PrimaryAttack");
 }
 
 void ACppCharacter::Dash()
 {
-	PlayAnimMontage(DashAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_Dash, this, &ACppCharacter::Dash_TimeElapsed, AttackAnimDelay);
-}
-
-void ACppCharacter::Dash_TimeElapsed()
-{
-	SpawnProjectile(DashProjectileClass);
+	ActionComp->StartActionByName(this, "Dash");
 }
 
 void ACppCharacter::Blackhole()
 {
-	PlayAnimMontage(BlackholeAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_Blackhole, this, &ACppCharacter::Blackhole_TimeElapsed, AttackAnimDelay);
+	ActionComp->StartActionByName(this, "Blackhole");
 }
-
-void ACppCharacter::Blackhole_TimeElapsed()
-{
-	SpawnProjectile(BlackholeProjectileClass);
-}
-
-void ACppCharacter::SpawnProjectile(TSubclassOf<AActor> classToSpawn)
-{
-	if (ensureAlways(classToSpawn))
-	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("evil_weapon_blades");
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
-
-		FCollisionShape Shape;
-		Shape.SetSphere(20.0f);
-
-		//ignore player
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(this);
-
-		FCollisionObjectQueryParams ObjParams;
-		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
-		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
-		ObjParams.AddObjectTypesToQuery(ECC_PhysicsBody);
-
-		FVector TraceStart = CameraComp->GetComponentLocation();
-
-		//endpoint far into the look-at distance (not too far, still adjust somewhat towards crosshair on a miss)
-		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
-
-		FHitResult Hit;
-		//return true if we got to a blocking hit
-		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params))
-		{
-			//Overwrite trace end with impact point in world
-			TraceEnd = Hit.ImpactPoint;
-		}
-
-		//find new direction/rotation from Hand pointing to impact point in world
-		FRotator ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
-
-		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
-		GetWorld()->SpawnActor<AActor>(classToSpawn, SpawnTM, SpawnParams);
-	}
-}
-
 
 void ACppCharacter::PrimaryInteract()
 {

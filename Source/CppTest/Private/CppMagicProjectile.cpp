@@ -37,7 +37,7 @@ ACppMagicProjectile::ACppMagicProjectile()
 	MovementComp->bInitialVelocityInLocalSpace = true;
 	
 	DamageAmount = 20.0f;
-}
+} 
 
 void ACppMagicProjectile::SpawnExplosion()
 {

@@ -12,42 +12,12 @@ class USpringArmComponent;
 class UCppInteractionComponent;
 class UAnimMontage;
 class USAttributeComponent;
+class USActionComponent;
 
 UCLASS()
 class CPPTEST_API ACppCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
-protected:
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> ProjectileClass;
-	float AttackAnimDelay;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	UAnimMontage* AttackAnim;
-
-	UPROPERTY(EditAnywhere, Category = "Dash")
-	TSubclassOf<AActor> DashProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Dash")
-	UAnimMontage* DashAnim;
-
-	UPROPERTY(EditAnywhere, Category = "Blackhole")
-	TSubclassOf<AActor> BlackholeProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Blackhole")
-	UAnimMontage* BlackholeAnim;
-
-	UPROPERTY(EditDefaultsOnly, Category = "PrimaryAttackEffect")
-	UParticleSystem* PrimaryAttackEffect;
-
-	FTimerHandle TimerHandle_PrimaryAttack;
-
-	FTimerHandle TimerHandle_Dash;
-
-	FTimerHandle TimerHandle_Blackhole;
-
 
 protected:
 	
@@ -63,23 +33,22 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USAttributeComponent* AttributeComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USActionComponent* ActionComp;
+
 	void MoveForward(float value);
 	
 	void MoveRight(float value);
 
-	void PrimaryAttack();
+	void SprintStart();
 
-	void PrimaryAttack_TimeElapsed();
+	void SprintStop();
+
+	void PrimaryAttack();
 
 	void Dash();
 
-	void Dash_TimeElapsed();
-
 	void Blackhole();
-
-	void Blackhole_TimeElapsed();
-
-	void SpawnProjectile(TSubclassOf<AActor> classToSpawn);
 
 	void PrimaryInteract();
 
