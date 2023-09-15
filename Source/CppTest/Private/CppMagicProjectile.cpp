@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
 #include "CppGameplayFunctionLibrary.h"
+#include "SActionComponent.h"
 
 // Sets default values
 ACppMagicProjectile::ACppMagicProjectile()
@@ -65,6 +66,17 @@ void ACppMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 {
 	if(OtherActor && OtherActor != GetInstigator())
 	{
+		
+		
+		USActionComponent* ActionComp = Cast<USActionComponent>(OtherActor->GetComponentByClass(USActionComponent::StaticClass()));
+		if (ActionComp && ActionComp->ActiveGameplayTags.HasTag(ParryTag))
+		{
+			MovementComp->Velocity = -MovementComp->Velocity;
+
+			SetInstigator(Cast<APawn>(OtherActor));
+			return;
+		}
+
 		SpawnExplosion();
 
 		UCppGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult);
@@ -85,18 +97,3 @@ void ACppMagicProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* 
 		Destroy();
 	}
 }
-
-// Called when the game starts or when spawned
-void ACppMagicProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void ACppMagicProjectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

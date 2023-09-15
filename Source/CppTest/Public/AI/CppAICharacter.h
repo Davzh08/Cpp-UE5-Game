@@ -10,6 +10,7 @@ class UPawnSensingComponent;
 class USAttributeComponent;
 class UUserWidget;
 class UCppWorldUserWidget;
+class USActionComponent;
 
 UCLASS()
 class CPPTEST_API ACppAICharacter : public ACharacter
@@ -45,6 +46,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USActionComponent* ActionComp;
 
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayTagContainer.h"
 #include "CppProjectileBase.h"
 #include "CppMagicProjectile.generated.h"
 
@@ -55,11 +56,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Damage Amount")
 	float DamageAmount;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	UPROPERTY(EditDefaultsOnly, Category = "Damage Amount")
+	FGameplayTag ParryTag;
 };
