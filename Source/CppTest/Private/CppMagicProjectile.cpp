@@ -77,11 +77,17 @@ void ACppMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponen
 			return;
 		}
 
-		SpawnExplosion();
+		if (UCppGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
+		{
+			SpawnExplosion();
 
-		UCppGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult);
+			if (ActionComp)
+			{
+				ActionComp->AddAction(GetInstigator(), BurningActionClass);
+			}
 
-		Destroy();
+			Destroy();
+		}
 	}
 
 }

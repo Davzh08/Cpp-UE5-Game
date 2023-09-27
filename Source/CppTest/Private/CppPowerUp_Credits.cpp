@@ -8,7 +8,7 @@
 // Sets default values
 ACppPowerUp_Credits::ACppPowerUp_Credits()
 {
-    CreditsAmount = 80;
+    CreditsAmount = 10;
 }
 
 

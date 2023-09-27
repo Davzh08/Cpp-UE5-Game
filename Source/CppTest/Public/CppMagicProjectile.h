@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "GameplayTagContainer.h"
 #include "CppProjectileBase.h"
+#include "SAction_Effect.h"
 #include "CppMagicProjectile.generated.h"
 
 class USphereComponent;
@@ -58,4 +59,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage Amount")
 	FGameplayTag ParryTag;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage Amount")
+	TSubclassOf<USAction_Effect> BurningActionClass;
 };
