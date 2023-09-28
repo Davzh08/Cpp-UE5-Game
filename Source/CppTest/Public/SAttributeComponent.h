@@ -7,7 +7,7 @@
 #include "SAttributeComponent.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewHealth, float, Delta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnAttributeChanged, AActor*, InstigatorActor, USAttributeComponent*, OwningComp, float, NewValue, float, Delta);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CPPTEST_API USAttributeComponent : public UActorComponent
@@ -21,53 +21,73 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes", meta = (DisplayName = "IsAlive"))
 	static bool IsActorAlive(AActor* Actor);
-	
-	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	float GetHealth() const { return Health; }
 
-	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	float GetHealthMax() const { return HealthMax; }
-	
-	// Sets default values for this component's properties
 	USAttributeComponent();
 
 protected:
 
-	//EditAnywhere - edit in BP editor and per-instance in level
-	//VisibleAnywhere - 'read-only' in editor and level. (Use for Components)
-	//EditDefaultsOnly - hide variable per-instance, edit in BP editor only
-	//VisibleDefaultsOnly - 'read-only' access for variable, only in BP editor (uncommon)
-	//EditInstanceOnly - allow only editing of instance (eg. when placed in level)
-	//--
-	//BlueprintReadOnly - read-only in the Blueprint scripting (does not affect 'details' panel)
-	//BlueprintReadWrite - read-write access in Blueprints
-	//--
-	//Category = "" - display only for detail panels and blueprint context menu
+	// EditAnywhere - edit in BP editor and per-instance in level.
+	// VisibleAnywhere - 'read-only' in editor and level. (Use for Components)
+	// EditDefaultsOnly - hide variable per-instance, edit in BP editor only
+	// VisibleDefaultsOnly - 'read-only' access for variable, only in BP editor (uncommon)
+	// EditInstanceOnly - allow only editing of instance (eg. when placed in level)
+	// --
+	// BlueprintReadOnly - read-only in the Blueprint scripting (does not affect 'details'-panel)
+	// BlueprintReadWrite - read-write access in Blueprints
+	// --
+	// Category = "" - display only for detail panels and blueprint context menu.
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
-	float HealthMax;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float Health;
 
-public:	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
+	float HealthMax;
 
-	UFUNCTION(BlueprintCallable)
+	/* Resource used to power certain Actions */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
+	float Rage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
+	float RageMax;
+
+	//UPROPERTY(ReplicatedUsing="")
+	//bool bIsAlive;
+
+	UFUNCTION(NetMulticast, Reliable) // @note: could mark as unreliable once we moved the 'state' out of scharacter (eg. once its cosmetic only)
+	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
+
+	UFUNCTION(NetMulticast, Unreliable) // Used for cosmetic changes only
+	void MulticastRageChanged(AActor* InstigatorActor, float NewRage, float Delta);
+
+public:
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool Kill(AActor* InstigatorActor);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
-	float DamageAmount;
-
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool IsAlive() const;
 
-	UPROPERTY(BlueprintAssignable)
-	FOnHealthChanged OnHealthChanged;
-	
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	bool ApplyHealthChange(AActor* InstigatorActor, float NewDamageAmount);
+	bool IsFullHealth() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	void SetDamageAmount(float NewDamageAmount);
-	
+	float GetHealth() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	float GetHealthMax() const;
+
+	UPROPERTY(BlueprintAssignable, Category = "Attributes")
+	FOnAttributeChanged OnHealthChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Attributes")
+	FOnAttributeChanged OnRageChanged;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
+
+	UFUNCTION(BlueprintCallable)
+	float GetRage() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool ApplyRage(AActor* InstigatorActor, float Delta);
 };

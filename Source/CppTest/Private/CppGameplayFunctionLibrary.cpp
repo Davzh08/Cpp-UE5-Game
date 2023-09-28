@@ -10,7 +10,10 @@ bool UCppGameplayFunctionLibrary::ApplyDamage(AActor* DamageCauser, AActor* Targ
 	USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(TargetActor);
 	if (AttributeComp)
 	{
-		return AttributeComp->ApplyHealthChange(DamageCauser, -DamageAmount);
+		bool bHealthChanged = AttributeComp->ApplyHealthChange(DamageCauser, -DamageAmount);
+		bool bRageChanged = AttributeComp->ApplyRage(DamageCauser, DamageAmount);
+
+		return bHealthChanged || bRageChanged;
 	}
 	return false;
 }

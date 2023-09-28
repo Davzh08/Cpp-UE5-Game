@@ -28,10 +28,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UParticleSystemComponent* EffectComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FlightSound")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
 	UAudioComponent* FlightSoundComponent;
 
-	UPROPERTY(EditAnywhere, Category = "ExplodeSound")
+	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* ExplodeSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CameraShake")

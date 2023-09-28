@@ -33,6 +33,8 @@ ACppCharacter::ACppCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
+
+	BlackholeRageCost = 100;
 }
 
 void ACppCharacter::PostInitializeComponents()
@@ -116,7 +118,16 @@ void ACppCharacter::Dash()
 
 void ACppCharacter::Blackhole()
 {
-	ActionComp->StartActionByName(this, "Blackhole");
+	if (AttributeComp && AttributeComp->GetRage() >= BlackholeRageCost)
+	{
+		AttributeComp->ApplyRage(this, -BlackholeRageCost);
+
+		ActionComp->StartActionByName(this, "Blackhole");
+	}
+	else
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, InsufficientSound, GetActorLocation());
+	}
 }
 
 void ACppCharacter::PrimaryInteract()

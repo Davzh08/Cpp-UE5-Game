@@ -2,6 +2,7 @@
 
 
 #include "CppPlayerState.h"
+#include "SAttributeComponent.h"
 
 
 void ACppPlayerState::AddCredits(int32 Delta)
@@ -36,9 +37,4 @@ bool ACppPlayerState::RemoveCredits(int32 Delta)
 	OnCreditsChanged.Broadcast(this, Credits, -Delta);
 
 	return true;
-}
-
-int32 ACppPlayerState::GetCredits() const
-{
-	return Credits;
 }

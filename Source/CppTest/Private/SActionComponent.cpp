@@ -39,7 +39,7 @@ void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> Acti
 
 	USAction* NewAction = NewObject<USAction>(this, ActionClass);
 	if (ensure(NewAction))
-	{
+	{	
 		Actions.Add(NewAction);
 
 		if (NewAction->bAutoStart && ensure(NewAction->CanStart(Instigator)))

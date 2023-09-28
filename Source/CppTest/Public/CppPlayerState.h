@@ -27,7 +27,9 @@ protected:
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Credits")
-	int32 GetCredits() const;
+	int32 GetCredits() const {
+		return Credits;
+	};
 
 	UFUNCTION(BlueprintCallable, Category = "Credits")
 	void AddCredits(int32 Delta);

@@ -59,6 +59,12 @@ protected:
 
 	virtual FVector GetPawnViewLocation() const override;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	USoundBase* InsufficientSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Cost")
+	int32 BlackholeRageCost;
+
 public:	
 
 	// Sets default values for this character's properties
